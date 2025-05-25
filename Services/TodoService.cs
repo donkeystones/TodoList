@@ -5,7 +5,7 @@ using Services.Mappers;
 
 namespace Services;
 
-public class TodoService(ITodoRepository repository)
+public class TodoService(ITodoRepository repository) : ITodoService
 {
     public TodoDTO AddTodo(string title)
     {
@@ -22,6 +22,16 @@ public class TodoService(ITodoRepository repository)
         TodoDTO dto = TodoMapper.ToDto(todo);
         
         return dto;
+    }
+
+    public TodoDTO EditTodo(Guid id, string editedTitle)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void DeleteTodo(Guid id)
+    {
+        throw new NotImplementedException();
     }
 
 

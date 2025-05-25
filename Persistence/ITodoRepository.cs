@@ -4,8 +4,8 @@ namespace Persistence;
 
 public interface ITodoRepository
 {
-    void AddTodo(TodoItem todo);
-    void EditTodo(Guid id, string editedTitle);
+    TodoItem AddTodo(TodoItem todo);
+    TodoItem EditTodo(Guid id, string editedTitle);
     void DeleteTodo(Guid id);
     List<TodoItem> GetTodos();
     
