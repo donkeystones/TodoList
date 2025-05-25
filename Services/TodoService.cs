@@ -29,7 +29,7 @@ public class TodoService(ITodoRepository repository) : ITodoService
         throw new NotImplementedException();
     }
 
-    public void DeleteTodo(Guid id)
+    public bool DeleteTodo(Guid id)
     {
         throw new NotImplementedException();
     }

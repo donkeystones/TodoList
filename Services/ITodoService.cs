@@ -6,6 +6,6 @@ public interface ITodoService
 {
     TodoDTO AddTodo(string title);
     TodoDTO EditTodo(Guid id, string editedTitle);
-    void DeleteTodo(Guid id);
+    bool DeleteTodo(Guid id);
     List<TodoDTO> GetTodos();
 }

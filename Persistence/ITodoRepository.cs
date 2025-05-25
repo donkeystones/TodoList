@@ -6,7 +6,7 @@ public interface ITodoRepository
 {
     TodoItem AddTodo(TodoItem todo);
     TodoItem EditTodo(Guid id, string editedTitle);
-    void DeleteTodo(Guid id);
+    bool DeleteTodo(Guid id);
     List<TodoItem> GetTodos();
     
 }
