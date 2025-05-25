@@ -1,6 +1,6 @@
 namespace Persistence;
 
-public class TodoRepository
+public class TodoJsonRepository
 {
     
 }
