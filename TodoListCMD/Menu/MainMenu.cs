@@ -104,6 +104,12 @@ public class MainMenu
         AnsiConsole.Write(table);
     }
 
+    private static void DeleteTodo()
+    {
+        var todos = _service.GetTodos();
+        
+    }
+
     private static Table TableLayout()
     {
         var table = new Table();
