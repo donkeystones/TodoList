@@ -1,19 +1,20 @@
+using Services;
 using Spectre.Console;
 
 namespace TodoListCMD.Menu;
 
-public class MainMenu
+public class MainMenu (ITodoService _service)
 {
-    private static string[] menuOptions = new string[]
-    {
+    private static string[] menuOptions =
+    [
         "Display todos",
         "Add todo",
         "Remove todos",
         "Edit todos",
         "Exit"
-    };
-    
-    public static string DisplayMenu()
+    ];
+
+    private static string DisplayMenu()
     {
         return AnsiConsole.Prompt(
             new SelectionPrompt<string>()
@@ -23,7 +24,18 @@ public class MainMenu
         );
     }
 
-    public static void RunSelection(string option)
+    public static void Run()
+    {
+        bool running = true;
+        while (running)
+        {
+            var option = DisplayMenu();
+            running = option != "Exit";
+            RunSelection(option);
+        }
+    }
+
+    private static void RunSelection(string option)
     {
         switch (option)
         {

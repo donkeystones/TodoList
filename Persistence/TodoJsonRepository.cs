@@ -3,7 +3,7 @@ using Persistence.Models;
 
 namespace Persistence;
 
-public class TodoJsonRepository
+public class TodoJsonRepository : ITodoRepository
 {
     private readonly string _filePath;
 
@@ -13,6 +13,11 @@ public class TodoJsonRepository
         
         if(!File.Exists(_filePath))
             File.WriteAllText(_filePath, "[]"); //Creates file and adds empty array
+    }
+
+    public bool DeleteTodo(Guid id)
+    {
+        throw new NotImplementedException();
     }
 
     public List<TodoItem> GetTodos()
@@ -31,7 +36,12 @@ public class TodoJsonRepository
         SaveTodos(todos);
         return item;
     }
-    
+
+    public TodoItem EditTodo(Guid id, string editedTitle)
+    {
+        throw new NotImplementedException();
+    }
+
     private void SaveTodos(List<TodoItem> todos)
     {
         var json = JsonSerializer.Serialize(todos, new JsonSerializerOptions
