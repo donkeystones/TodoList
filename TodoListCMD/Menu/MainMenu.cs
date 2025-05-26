@@ -1,10 +1,19 @@
+using Persistence;
 using Services;
+using Services.DTO;
 using Spectre.Console;
 
 namespace TodoListCMD.Menu;
 
-public class MainMenu (ITodoService _service)
+public class MainMenu
 {
+    private static ITodoService _service;
+
+    public MainMenu(ITodoService service)
+    {
+        _service = service;
+    }
+    
     private static string[] menuOptions =
     [
         "Display todos",
@@ -40,16 +49,10 @@ public class MainMenu (ITodoService _service)
         switch (option)
         {
             case "Display todos":
-                Console.WriteLine("Displaying todos");
-                Console.WriteLine("Press any key to continue...");
-                Console.ReadKey();
-                Console.Clear();
+                DisplayTodos();
                 break;
             case "Add todo":
-                Console.WriteLine("Adding todos");
-                Console.WriteLine("Press any key to continue...");
-                Console.ReadKey();
-                Console.Clear();
+                AddTodo();
                 break;
             case "Remove todos":
                 Console.WriteLine("Removing todos");
@@ -70,5 +73,44 @@ public class MainMenu (ITodoService _service)
                 Console.Clear();
                 break;
         }
+    }
+
+    private static void AddTodo()
+    {
+        var title = AnsiConsole.Prompt(new TextPrompt<string>("Title for your todo"));
+        var todo = _service.AddTodo(title);
+        DisplayTodo(todo);
+    }
+
+    private static void DisplayTodo(TodoDTO todo)
+    {
+        var table = TableLayout();
+        
+        table.AddRow(todo.Id.ToString(), todo.Title, todo.Date.ToString(), todo.Completed ? Emoji.Known.CheckMark : Emoji.Known.CrossMark);
+
+        AnsiConsole.Write(table);
+    }
+
+    private static void DisplayTodos()
+    {
+        var todos = _service.GetTodos();
+        var table = TableLayout();
+        
+        foreach (TodoDTO todo in todos)
+        {
+            table.AddRow(todo.Id.ToString(), todo.Title, todo.Date.ToString(), todo.Completed ? Emoji.Known.CheckMark : Emoji.Known.CrossMark);
+        }
+        
+        AnsiConsole.Write(table);
+    }
+
+    private static Table TableLayout()
+    {
+        var table = new Table();
+        table.AddColumn(new TableColumn("Id"));
+        table.AddColumn(new TableColumn("Title"));
+        table.AddColumn(new TableColumn("Date"));
+        table.AddColumn(new TableColumn("Done"));
+        return table;
     }
 }

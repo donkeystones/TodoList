@@ -27,9 +27,9 @@ IHost host = Host.CreateDefaultBuilder(args)
         // Register the service
         services.AddSingleton<ITodoService, TodoService>();
 
-        // Register the menu (no statics any more)
+        // Register the menu (no statics anymore)
         services.AddSingleton<MainMenu>();
     }).Build();
     
-    var menu = host.Services.GetRequiredService<MainMenu>();
-    MainMenu.Run();
+var menu = host.Services.GetRequiredService<MainMenu>();
+MainMenu.Run();
