@@ -31,7 +31,7 @@ public class TodoService(ITodoRepository repository) : ITodoService
 
     public bool DeleteTodo(Guid id)
     {
-        throw new NotImplementedException();
+        return repository.DeleteTodo(id);
     }
 
 

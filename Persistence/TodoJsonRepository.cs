@@ -17,7 +17,17 @@ public class TodoJsonRepository : ITodoRepository
 
     public bool DeleteTodo(Guid id)
     {
-        throw new NotImplementedException();
+        try
+        {
+            var todos = GetTodos();
+            todos = todos.Where(todo => todo.Id != id).ToList();
+            SaveTodos(todos);
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
     }
 
     public List<TodoItem> GetTodos()

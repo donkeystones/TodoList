@@ -18,8 +18,8 @@ public class MainMenu
     [
         "Display todos",
         "Add todo",
-        "Remove todos",
-        "Edit todos",
+        "Remove todo",
+        "Edit todo",
         "Exit"
     ];
 
@@ -54,17 +54,16 @@ public class MainMenu
             case "Add todo":
                 AddTodo();
                 break;
-            case "Remove todos":
-                Console.WriteLine("Removing todos");
-                Console.WriteLine("Press any key to continue...");
-                Console.ReadKey();
-                Console.Clear();
+            case "Remove todo":
+                DeleteTodo();
                 break;
-            case "Edit todos":
+            case "Edit todo":
                 Console.WriteLine("Editing todos");
                 Console.WriteLine("Press any key to continue...");
                 Console.ReadKey();
                 Console.Clear();
+                break;
+            case "Exit":
                 break;
             default:
                 Console.WriteLine("Please select a valid option.");
@@ -107,7 +106,15 @@ public class MainMenu
     private static void DeleteTodo()
     {
         var todos = _service.GetTodos();
-        
+        var todoToRemove = AnsiConsole.Prompt(
+            new SelectionPrompt<TodoDTO>()
+            .Title("Which todo do you want to remove?")
+            .PageSize(10)
+            .UseConverter(todo => todo.Title)
+            .AddChoices(todos.ToArray()));
+
+        var deleted = _service.DeleteTodo(todoToRemove.Id);
+        Console.WriteLine(deleted ? $"\"{todoToRemove.Title}\" Removed!" : "Delete failed!");
     }
 
     private static Table TableLayout()
