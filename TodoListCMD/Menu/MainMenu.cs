@@ -58,10 +58,7 @@ public class MainMenu
                 DeleteTodo();
                 break;
             case "Edit todo":
-                Console.WriteLine("Editing todos");
-                Console.WriteLine("Press any key to continue...");
-                Console.ReadKey();
-                Console.Clear();
+                EditTodo();
                 break;
             case "Exit":
                 break;
@@ -115,6 +112,25 @@ public class MainMenu
 
         var deleted = _service.DeleteTodo(todoToRemove.Id);
         Console.WriteLine(deleted ? $"\"{todoToRemove.Title}\" Removed!" : "Delete failed!");
+    }
+
+    private static void EditTodo()
+    {
+        var todos = _service.GetTodos();
+        var todoToEdit = AnsiConsole.Prompt(
+            new SelectionPrompt<TodoDTO>()
+                .Title("Which todo do you want to edit?")
+                .PageSize(10)
+                .UseConverter(todo => todo.Title)
+                .AddChoices(todos.ToArray()));
+
+        var newTitle = AnsiConsole.Prompt(
+            new TextPrompt<string>("").DefaultValue(todoToEdit.Title)
+        );
+
+        var todo = _service.EditTodo(todoToEdit.Id, newTitle);
+        
+        AnsiConsole.WriteLine($"Edited \"{todoToEdit.Title}\" to \"{todo.Title}\"");
     }
 
     private static Table TableLayout()

@@ -49,7 +49,11 @@ public class TodoJsonRepository : ITodoRepository
 
     public TodoItem EditTodo(Guid id, string editedTitle)
     {
-        throw new NotImplementedException();
+        var todos = GetTodos();
+        var todoIdx = todos.FindIndex(todo => todo.Id == id);
+        todos[todoIdx].Title = editedTitle;
+        SaveTodos(todos);
+        return todos[todoIdx];
     }
 
     private void SaveTodos(List<TodoItem> todos)

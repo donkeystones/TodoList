@@ -26,7 +26,7 @@ public class TodoService(ITodoRepository repository) : ITodoService
 
     public TodoDTO EditTodo(Guid id, string editedTitle)
     {
-        throw new NotImplementedException();
+        return TodoMapper.ToDto(repository.EditTodo(id, editedTitle));
     }
 
     public bool DeleteTodo(Guid id)
