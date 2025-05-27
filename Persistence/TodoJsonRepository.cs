@@ -56,6 +56,15 @@ public class TodoJsonRepository : ITodoRepository
         return todos[todoIdx];
     }
 
+    public TodoItem CompleteTodo(Guid id)
+    {
+        var todos = GetTodos();
+        var todoIdx = todos.FindIndex(todo => todo.Id == id);
+        todos[todoIdx].Completed = true;
+        SaveTodos(todos);
+        return todos[todoIdx];
+    }
+
     private void SaveTodos(List<TodoItem> todos)
     {
         var json = JsonSerializer.Serialize(todos, new JsonSerializerOptions

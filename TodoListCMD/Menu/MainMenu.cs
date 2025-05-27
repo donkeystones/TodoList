@@ -1,4 +1,3 @@
-using Persistence;
 using Services;
 using Services.DTO;
 using Spectre.Console;
@@ -7,19 +6,20 @@ namespace TodoListCMD.Menu;
 
 public class MainMenu
 {
-    private static ITodoService _service;
+    private static ITodoService _service = null!;
 
     public MainMenu(ITodoService service)
     {
         _service = service;
     }
     
-    private static string[] menuOptions =
+    private static readonly string[] MenuOptions =
     [
         "Display todos",
         "Add todo",
         "Remove todo",
         "Edit todo",
+        "Complete todo",
         "Exit"
     ];
 
@@ -27,9 +27,9 @@ public class MainMenu
     {
         return AnsiConsole.Prompt(
             new SelectionPrompt<string>()
-                .Title("Please select an option.")
+                .Title("[bold underline blue]Please select an option:[/]")
                 .PageSize(10)
-                .AddChoices(menuOptions)
+                .AddChoices(MenuOptions)
         );
     }
 
@@ -38,9 +38,14 @@ public class MainMenu
         bool running = true;
         while (running)
         {
+            Console.Clear();
             var option = DisplayMenu();
             running = option != "Exit";
             RunSelection(option);
+            
+            AnsiConsole.WriteLine(); // Add space after action
+            AnsiConsole.MarkupLine("[grey]Press any key to return to menu...[/]");
+            Console.ReadKey(true);
         }
     }
 
@@ -59,6 +64,9 @@ public class MainMenu
                 break;
             case "Edit todo":
                 EditTodo();
+                break;
+            case "Complete todo":
+                CompleteTodo();
                 break;
             case "Exit":
                 break;
@@ -80,9 +88,8 @@ public class MainMenu
 
     private static void DisplayTodo(TodoDTO todo)
     {
-        var table = TableLayout();
-        
-        table.AddRow(todo.Id.ToString(), todo.Title, todo.Date.ToString(), todo.Completed ? Emoji.Known.CheckMark : Emoji.Known.CrossMark);
+        var table = TableLayout("Todo Details");
+        table.AddRow(todo.Title, todo.Date.ToString(), todo.Completed ? Emoji.Known.CheckMark : Emoji.Known.CrossMark);
 
         AnsiConsole.Write(table);
     }
@@ -90,56 +97,84 @@ public class MainMenu
     private static void DisplayTodos()
     {
         var todos = _service.GetTodos();
-        var table = TableLayout();
-        
-        foreach (TodoDTO todo in todos)
+        if (todos.Count != 0)
         {
-            table.AddRow(todo.Id.ToString(), todo.Title, todo.Date.ToString(), todo.Completed ? Emoji.Known.CheckMark : Emoji.Known.CrossMark);
+            var table = TableLayout("All Todos");
+            foreach (var todo in todos)
+            {
+                table.AddRow(todo.Title, todo.Date.ToString(), todo.Completed ? Emoji.Known.CheckMark : Emoji.Known.CrossMark);
+            }
+            AnsiConsole.Write(table);
         }
-        
-        AnsiConsole.Write(table);
+        else
+        {
+            AnsiConsole.MarkupLine("[italic grey]No todos registered![/]");
+        }
     }
 
     private static void DeleteTodo()
     {
         var todos = _service.GetTodos();
-        var todoToRemove = AnsiConsole.Prompt(
-            new SelectionPrompt<TodoDTO>()
-            .Title("Which todo do you want to remove?")
-            .PageSize(10)
-            .UseConverter(todo => todo.Title)
-            .AddChoices(todos.ToArray()));
+        var todoToRemove = SelectTodo("remove", todos);
 
         var deleted = _service.DeleteTodo(todoToRemove.Id);
-        Console.WriteLine(deleted ? $"\"{todoToRemove.Title}\" Removed!" : "Delete failed!");
+        AnsiConsole.MarkupLine(deleted
+            ? $"[green]\"{todoToRemove.Title}\" removed successfully![/]"
+            : $"[red]Delete failed![/]");
     }
 
     private static void EditTodo()
     {
         var todos = _service.GetTodos();
-        var todoToEdit = AnsiConsole.Prompt(
+        var todoToEdit = SelectTodo("edit", todos);
+
+        var newTitle = AnsiConsole.Prompt(
+            new TextPrompt<string>("")
+                .DefaultValue(todoToEdit.Title)
+                .AllowEmpty()
+        );
+
+        if (newTitle != todoToEdit.Title){
+            var todo = _service.EditTodo(todoToEdit.Id, newTitle);
+            AnsiConsole.WriteLine($"Edited \"{todoToEdit.Title}\" to \"{todo.Title}\"");
+        }
+        else AnsiConsole.WriteLine("Title was not changed.");
+    }
+
+    private static TodoDTO SelectTodo(string promptTitle, List<TodoDTO> todos)
+    {
+        return AnsiConsole.Prompt(
             new SelectionPrompt<TodoDTO>()
-                .Title("Which todo do you want to edit?")
+                .Title($"Which todo do you want to {promptTitle}?")
                 .PageSize(10)
                 .UseConverter(todo => todo.Title)
                 .AddChoices(todos.ToArray()));
+    }
+    
+    private static void CompleteTodo()
+    {
+        var todos = _service.GetTodos();
+        todos = todos.Where(todo => !todo.Completed).ToList();
+        if (todos.Count == 0)
+        {
+            AnsiConsole.MarkupLine("[green]No todos to complete![/]");
+        }else {
+            var todoToComplete = SelectTodo("complete", todos);
 
-        var newTitle = AnsiConsole.Prompt(
-            new TextPrompt<string>("").DefaultValue(todoToEdit.Title)
-        );
-
-        var todo = _service.EditTodo(todoToEdit.Id, newTitle);
-        
-        AnsiConsole.WriteLine($"Edited \"{todoToEdit.Title}\" to \"{todo.Title}\"");
+            _service.CompleteTodo(todoToComplete.Id);
+            AnsiConsole.MarkupLine($":check_mark_button: [green]{todoToComplete.Title} completed![/]");
+            AnsiConsole.MarkupLine("[bold yellow]Nice work, keep it up![/]");
+        }
     }
 
-    private static Table TableLayout()
+    private static Table TableLayout(string tableTitle)
     {
         var table = new Table();
-        table.AddColumn(new TableColumn("Id"));
+        table.Title = new TableTitle(tableTitle);
         table.AddColumn(new TableColumn("Title"));
         table.AddColumn(new TableColumn("Date"));
         table.AddColumn(new TableColumn("Done"));
         return table;
     }
+    
 }
