@@ -20,6 +20,7 @@ public class MainMenu
         "Remove todo",
         "Edit todo",
         "Complete todo",
+        "Uncomplete todo",
         "Exit"
     ];
 
@@ -68,6 +69,9 @@ public class MainMenu
             case "Complete todo":
                 CompleteTodo();
                 break;
+            case "Uncomplete todo":
+                UncompleteTodo();
+                break;
             case "Exit":
                 break;
             default:
@@ -78,6 +82,7 @@ public class MainMenu
                 break;
         }
     }
+
 
     private static void AddTodo()
     {
@@ -162,11 +167,27 @@ public class MainMenu
             var todoToComplete = SelectTodo("complete", todos);
 
             _service.CompleteTodo(todoToComplete.Id);
-            AnsiConsole.MarkupLine($":check_mark_button: [green]{todoToComplete.Title} completed![/]");
+            AnsiConsole.MarkupLine($":check_mark_button: [green]{todoToComplete.Title} set as completed![/]");
             AnsiConsole.MarkupLine("[bold yellow]Nice work, keep it up![/]");
         }
     }
 
+    private static void UncompleteTodo()
+    {
+        var todos = _service.GetTodos();
+        todos = todos.Where(todo => todo.Completed).ToList();
+        if (todos.Count == 0)
+        {
+            AnsiConsole.MarkupLine("[green]No todos to uncomplete![/]");
+        }else {
+            var todoToComplete = SelectTodo("complete", todos);
+
+            _service.UncompleteTodo(todoToComplete.Id);
+            AnsiConsole.MarkupLine($":cross_mark: [green]{todoToComplete.Title} set as uncompleted![/]");
+            AnsiConsole.MarkupLine("[bold yellow]Nice work, keep it up![/]");
+        }
+    }
+    
     private static Table TableLayout(string tableTitle)
     {
         var table = new Table();

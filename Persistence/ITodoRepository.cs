@@ -8,6 +8,7 @@ public interface ITodoRepository
     TodoItem EditTodo(Guid id, string editedTitle);
     bool DeleteTodo(Guid id);
     TodoItem CompleteTodo(Guid id);
+    TodoItem UncompleteTodo(Guid id);
     List<TodoItem> GetTodos();
     
 }

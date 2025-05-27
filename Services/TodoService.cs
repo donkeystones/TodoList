@@ -51,5 +51,10 @@ public class TodoService(ITodoRepository repository) : ITodoService
     {
         return TodoMapper.ToDto(repository.CompleteTodo(id));
     }
+
+    public TodoDTO UncompleteTodo(Guid id)
+    {
+        return TodoMapper.ToDto(repository.UncompleteTodo(id));
+    }
     
 }
